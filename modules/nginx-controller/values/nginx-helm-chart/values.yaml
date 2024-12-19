@@ -1,0 +1,25 @@
+replicaCount: 1
+image:
+  repository: nginx
+  tag: "1.21"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+#ingress:
+#  enabled: false
+#  hostname: "example.com"
+
+pageContent: |
+  <!DOCTYPE html>
+  <html>
+  <head>
+      <title>Welcome to Nginx</title>
+  </head>
+  <body>
+      <h1>Hello from Nginx!</h1>
+      <p>This is a static page served by Nginx.</p>
+  </body>
+  </html>

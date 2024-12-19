@@ -1,0 +1,5 @@
+apiVersion: v2
+name: nginx-single-page
+description: A Helm chart to deploy Nginx serving a single static HTML page
+version: 0.1.0
+appVersion: "1.21"
