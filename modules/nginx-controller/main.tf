@@ -1,28 +1,26 @@
+
 resource "helm_release" "ingress_nginx" {
   name       = "ingress-nginx"
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart      = "ingress-nginx"
   version = "4.2.3"
 
-  set {
-    name  = "controller.service.type"
-    value = "LoadBalancer"
-  }
-
-  set {
-    name  = "controller.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type"
-    value = "external"
-  }
-
-  set {
-    name  = "controller.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-scheme"
-    value = "internet-facing"
-  }
-
-  set {
-    name  = "controller.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-subnets"
-    value = join(",", var.subnets)
-  }
+  values = [
+    <<EOF
+controller:
+  service:
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "nlb" # Use Network Load Balancer
+      service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    externalTrafficPolicy: Local
+  ingressClassResource:
+    name: nginx
+    enabled: true
+    default: true
+EOF
+  ]
 }
 
 resource "kubernetes_ingress_v1" "nginx_ingress" {
@@ -30,11 +28,7 @@ resource "kubernetes_ingress_v1" "nginx_ingress" {
   metadata {
     name      = "nginx-ingress"
     annotations = {
-      "kubernetes.io/ingress.class"                            = "nginx"
-      "alb.ingress.kubernetes.io/scheme"                      = "internet-facing"
-      "alb.ingress.kubernetes.io/target-type"                 = "ip"
-      "alb.ingress.kubernetes.io/listen-ports"                = "[{\"HTTP\":80}]"
-      "alb.ingress.kubernetes.io/backend-protocol"            = "HTTP"
+      "nginx.ingress.kubernetes.io/rewrite-target" = "/"
     }
   }
 
