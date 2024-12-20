@@ -1,7 +1,7 @@
 resource "helm_release" "service_1" {
   name       = "service-1"
   namespace  = "default"
-  chart      = "${path.module}/values/nginx-helm-chart" # Path to the Helm chart
+  chart      = "${path.module}/values/nginx-helm-chart"
 
   values = [
     <<EOF

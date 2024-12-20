@@ -5,22 +5,7 @@ resource "helm_release" "ingress_nginx" {
   chart      = "ingress-nginx"
   version = "4.2.3"
 
-  values = [
-    <<EOF
-controller:
-  service:
-    type: LoadBalancer
-    annotations:
-      service.beta.kubernetes.io/aws-load-balancer-type: "nlb" # Use Network Load Balancer
-      service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
-      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
-    externalTrafficPolicy: Local
-  ingressClassResource:
-    name: nginx
-    enabled: true
-    default: true
-EOF
-  ]
+  values = [local.ingress-values]
 }
 
 resource "kubernetes_ingress_v1" "nginx_ingress" {
@@ -66,6 +51,5 @@ resource "kubernetes_ingress_v1" "nginx_ingress" {
       }
     }
   }
-
   depends_on = [helm_release.ingress_nginx]
 }
